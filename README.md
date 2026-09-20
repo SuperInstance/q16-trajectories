@@ -32,7 +32,9 @@ seed → runArgument → features[16] per round → ℚ integer points (trajecto
 | `src/breed.js` | `breed()` — run the argument, record the walk. `distill()` — ≤200-word ocean report. |
 | `src/tidepool-client.js` | The pipe. Never throws on the write path; timeout via AbortController; honest offline degrade. |
 | `src/lineage.js` | Nearest-neighbor re-rank by exact integer cosine; round-by-round ancestry chain. |
+| `src/sigma-loop.js` | The σ tuning loop: (persona × jitter) grid under fuel caps + the measurement noise-floor probe, with an honest verdict on any σ target. |
 | `bin/breed.js` | CLI: breed → local JSONL WAL → optional ocean write → lineage summary. |
+| `bin/sigma-loop.js` | CLI: print the grid, the floor, and whether a `--target` σ is honestly reachable. |
 
 ## Run it
 
@@ -62,6 +64,18 @@ node bin/breed.js --seed caravan/9 --artist monk --endpoint https://tidepool.<su
 - tidepool stores `artifacts(native JSON[16], …)` + `runs(task, outcome, …)`; `similar?vec=` = native NN — tests: 18 passed (README accurate).
 - Stale claim refuted: tidepool has **no** WAL/thread-memory/stall-event tables — the real shapes are `artifacts` + `runs`, and this bridge speaks both.
 - Both sides were designed for this collision (tidepool README cites duke centroids); the missing pieces were the pipe, the identity layer, and the trajectory record.
+
+## The σ loop (2026-09-20)
+
+`node bin/sigma-loop.js --seed caravan/9 --artist monk --target 0.08`
+
+Findings, measured not hoped:
+- Best honest walk under fuel 7: engineer @ jitter 0.05, σ → **0.1418** (HONEST GAP).
+- Measurement noise floor: a take generated *at* the effective centroid (jitter 0)
+  still reads σ ≈ **0.12–0.15** — the engine measures σ on ONE take per round.
+- **σ 0.08 is below that floor.** It is unreachable by any amount of tuning or fuel;
+  it becomes reachable only by changing how σ is measured (mean over N takes) —
+  an engine-side (duke-lab) decision, logged here rather than papered over.
 
 ## Honest gaps (v0)
 

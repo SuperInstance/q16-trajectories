@@ -124,6 +124,40 @@ t('distill carries the identity explicitly', () => {
   assert.ok(body.includes(bredA.final.point.join(',')));
 });
 
+/* ------------------------- the σ tuning loop ------------------------- */
+console.log('== sigma-loop: honest reachability of a σ target ==');
+const { sigmaLoop, noiseFloor, assess } = require('../src/sigma-loop');
+const loopA = sigmaLoop({ seed: 'test/loop/1', artist: 'monk', fuel: { maxRounds: 3 } });
+const loopA2 = sigmaLoop({ seed: 'test/loop/1', artist: 'monk', fuel: { maxRounds: 3 } });
+t('loop is deterministic', () => {
+  assert.strictEqual(JSON.stringify(loopA), JSON.stringify(loopA2));
+});
+t('cells respect the fuel cap', () => {
+  loopA.cells.forEach((c) => assert.ok(c.nRounds <= 4)); // 3 revisions + round 0
+});
+t('cells sorted by final σ, best is first', () => {
+  for (let i = 1; i < loopA.cells.length; i++)
+    assert.ok(loopA.cells[i].finalSigma >= loopA.cells[0].finalSigma);
+  assert.strictEqual(loopA.best.finalSigma, loopA.cells[0].finalSigma);
+});
+t('noise floor is positive and is the min over personas', () => {
+  const f = noiseFloor({ seed: 'test/floor/1', artist: 'monk', persona: 'purist' });
+  assert.ok(f > 0 && f < 0.5);
+  assert.strictEqual(loopA.noiseFloor, Math.min(...Object.values(loopA.floors)));
+});
+t('0.08 is below the single-take measurement floor (honest gap, monk)', () => {
+  // vendored engine measures σ on ONE take per round: even a take generated
+  // AT the effective centroid reads σ ≈ 0.12–0.15. If an engine-side change
+  // (mean over N takes) lowers this floor, revisit the 0.08 target.
+  const a = assess(loopA, 0.08);
+  assert.strictEqual(a.aboveFloor, false);
+  assert.ok(a.verdict.startsWith('HONEST GAP'));
+});
+t('a target above the floor reads reachable-in-principle', () => {
+  const a = assess(loopA, loopA.noiseFloor + 0.05);
+  assert.strictEqual(a.aboveFloor, true);
+});
+
 /* ------------------------- the pipe (mock ocean) ------------------------- */
 console.log('== tidepool client: never-throw write path ==');
 
