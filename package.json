@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Q16 breed trajectories — duke-lab's generative argument bred in tidepool's 16-dim rational vector space. v0 seam exploration.",
   "scripts": {
-    "test": "node tests/q16.test.js",
+    "test": "node tests/q16.test.js && node tests/gan-traj.test.js",
     "breed": "node bin/breed.js"
   },
   "license": "MIT"
