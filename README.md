@@ -33,6 +33,7 @@ seed → runArgument → features[16] per round → ℚ integer points (trajecto
 | `src/tidepool-client.js` | The pipe. Never throws on the write path; timeout via AbortController; honest offline degrade. |
 | `src/lineage.js` | Nearest-neighbor re-rank by exact integer cosine; round-by-round ancestry chain. |
 | `src/sigma-loop.js` | The σ tuning loop: (persona × jitter) grid under fuel caps + the measurement noise-floor probe, with an honest verdict on any σ target. |
+| `src/gan-distill.js` | The ledger-seeded GAN: witness RNG (fnv1a-64, café Δ 日本語 pin) + generator that resamples its own kept ledger + integer coherence critic + multiplicative {0,1} viability floor (zero ethos still sunsets). Every candidate books a hash-chained receipt — kept *and* rejected. Measured (rounds=12): first-3 coherence 610.67 → last-3 651.33, kept 12/12. |
 | `bin/breed.js` | CLI: breed → local JSONL WAL → optional ocean write → lineage summary. |
 | `bin/sigma-loop.js` | CLI: print the grid, the floor, and whether a `--target` σ is honestly reachable. |
 
